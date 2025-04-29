@@ -1,0 +1,7 @@
+pandas 
+numpy  
+matplotlib
+scikit-learn
+python-binance
+prophet
+cryptography
