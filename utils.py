@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np 
 import  requests
 import os  
+from dotenv import load_dotenv
 
 
 class get_data_crypto:
@@ -12,6 +13,8 @@ class get_data_crypto:
         data_time = {'minutes':Client.KLINE_INTERVAL_1MINUTE,'seconds':Client.KLINE_INTERVAL_1SECOND,'hours':Client.KLINE_INTERVAL_1HOUR,}
         if time not in data_time:
             raise ValueError(f'El parámetro {time} no está en las opciones {data_time}')
+        
+        load_dotenv()
         
         api_key  = os.getenv("BINANCE_API_KEY")
         api_secret = os.getenv("BINANCE_API_SECRET")
