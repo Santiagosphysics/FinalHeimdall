@@ -78,18 +78,3 @@ class get_data_crypto:
         return df
 
 
-    def test_11():
-        return print('Hello ', '*'*50)
-
-if __name__ == "__main__":
-    crypto = get_data_crypto()
-    df = crypto.download_data_cloud(
-        start_time='2025-04-26',
-        end_time='2025-04-27',
-        crypto='binancecoin',
-        time='minutes'
-    )
-    print(df.head())
-# df = get_data_crypto().download_data_cloud(start_time='2025-04-26', end_time='2025-04-27', crypto="binancecoin", time='minutes')
-
-# print(df)
