@@ -1,11 +1,16 @@
-from binance.client import Client
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np 
-import  requests
-import os  
+
 from dotenv import load_dotenv
 
+
+from binance.client import Client
+from prophet import Prophet
+import  requests
+
+
+import os  
 
 class get_data_crypto:
     def download_data(self, start_time, end_time, crypto, time):
@@ -76,5 +81,28 @@ class get_data_crypto:
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
 
         return df
+    
 
+    
+
+class models:
+    def prophet_model(data, time):
+        if len(data.columns) > 2:
+            raise ValueError('Your dataset has more than two columns {data.columns}')
+        data.columns = ['ds','y']
+
+        model = Prophet(daily_seasonality=True)
+        model.fit(data)
+
+        future = model.make_future_dataframe(periods=24*60, freq = time)
+
+        predict = model.predict(future)
+
+        fig1 = model.plot(predict)
+        plt.title('Prediction for the price for the next 24 hours')
+        plt.ylabel('Price')
+        plt.xlabel('Date')
+        plt.show()
+
+        return predict
 

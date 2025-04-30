@@ -6,3 +6,4 @@ python-binance
 prophet
 cryptography
 python-dotenv
+python-prophet
