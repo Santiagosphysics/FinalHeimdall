@@ -17,7 +17,7 @@ import os
 class get_data_crypto:
     def download_data(self, start_time, end_time, crypto, time):
 
-        data_time = {'minutes':Client.KLINE_INTERVAL_1MINUTE,'seconds':Client.KLINE_INTERVAL_1SECOND,'hours':Client.KLINE_INTERVAL_1HOUR,}
+        data_time = {'min':Client.KLINE_INTERVAL_1MINUTE,'S':Client.KLINE_INTERVAL_1SECOND,'hours':Client.KLINE_INTERVAL_1HOUR,}
         if time not in data_time:
             raise ValueError(f'El parámetro {time} no está en las opciones {data_time}')
         
@@ -52,6 +52,9 @@ class get_data_crypto:
         df['close'] = df['close'].astype(float)
         df['open'] = df['open'].astype(float)
 
+        df = df[['close_time', 'close']]
+        df = df.rename({'close_time':'ds', 'close':'y'})
+
         return df
 
 
@@ -84,19 +87,22 @@ class get_data_crypto:
 
         return df
     
-
-
-
 class models:
     def prophet_model(data, time):
         if len(data.columns) > 2:
             raise ValueError('Your dataset has more than two columns {data.columns}')
+        
         data.columns = ['ds','y']
 
         model = Prophet(daily_seasonality=True)
         model.fit(data)
 
-        future = model.make_future_dataframe(periods=24*60, freq = time)
+        if time == 'min':
+            future = model.make_future_dataframe(periods=24*60, freq = time)
+        elif time == 'S':
+            future = model.make_future_dataframe(periods=24*60*60, freq = time)
+        else:
+            raise ValueError('Please write a correct option for time ("S" or "min")')
 
         predict = model.predict(future)
 
@@ -158,7 +164,7 @@ class models:
         plt.figure(figsize=(10,10))
         plt.plot(df_final['ds'], response, label='Predicted future labels', color='r')
         plt.plot(df['ds'], df['y'], label = 'Real price', color='b')
-        plt.title(f'Prediction since {df['ds'].max()} using XGBoost')
+        plt.title(f'Prediction since using XGBoost')
         plt.ylabel('Price')
         plt.xlabel('Date')
         plt.show()
