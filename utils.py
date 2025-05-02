@@ -61,7 +61,7 @@ class get_data_crypto:
 
     def download_data_cloud(self, start_time, end_time, crypto, time):
 
-        data_time = {'minutes':'minute', 'hours':'hour'}
+        data_time = {'min':'min', 'S':'S'}
 
         if time not in data_time:
             raise ValueError(f'The value {time} doesnt have in options: {data_time}')
@@ -84,6 +84,8 @@ class get_data_crypto:
         prices = data['prices']
         df = pd.DataFrame(prices, columns=['timestamp','price'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+
+    
 
         return df
     
@@ -112,7 +114,9 @@ class models:
         plt.xlabel('Date')
         plt.show()
 
-        return predict
+        print(predict.columns)
+
+        return data, predict
 
 
 
@@ -258,3 +262,21 @@ class models:
         df_result = pd.concat([df_real, df_final], ignore_index=True)
 
         return df_result[['ds', 'y']]
+
+
+class meassures():
+    def data_predict(data, model, crypto, time):
+        model.columns = ['ds', 'predict price']
+
+        start_time = model['ds'].min()
+        end_time = model['ds'].max()
+
+        # real_data = get_data_crypto().download_data(start_time=start_time, end_time=end_time, crypto=crypto, time=time)
+        data.columns = ['ds','real price']
+
+        df = pd.merge(left=model, right=data, on='ds', how='left')
+        df = df.dropna(axis=0).reset_index(drop=True)
+
+        df['Accuracy'] = round(df['predict price'] / df['real price'], 2)
+        
+        return df

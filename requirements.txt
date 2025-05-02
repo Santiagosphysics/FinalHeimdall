@@ -8,4 +8,4 @@ cryptography
 python-dotenv
 python-prophet
 xgboost
-tensorflow
+tensorflow  
