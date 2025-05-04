@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import pandas as pd
 import numpy as np 
 
@@ -90,7 +91,7 @@ class get_data_crypto:
         return df
     
 class models:
-    def prophet_model(data, time):
+    def prophet_model(self, data, time):
         if len(data.columns) > 2:
             raise ValueError('Your dataset has more than two columns {data.columns}')
         
@@ -114,17 +115,15 @@ class models:
         plt.xlabel('Date')
         plt.show()
 
-        print(predict.columns)
-
         return data, predict
 
 
 
-    def XGBoost_model(data, time ):
+    def XGBoost_model(self, data, time ):
         data.columns = ['ds', 'y']
         df = pd.DataFrame()
 
-        if time == 's':
+        if time == 'S':
             df['second']= data['ds'].dt.second
         
         df['minute'] = data['ds'].dt.minute
@@ -141,12 +140,12 @@ class models:
         model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
         model.fit(X, y)
 
-        if time == 'm':
+        if time == 'min':
             df_pred = pd.date_range(start=df['ds'].max() + pd.Timedelta(minutes=1), periods=24*60, freq='min')
-        elif time == 's':
+        elif time == 'S':
             df_pred = pd.date_range(start=df['ds'].max() + pd.Timedelta(seconds=1), periods=24*60*60, freq='S')
         else:
-            raise ValueError('Please write a correct option (m, s) ')
+            raise ValueError('Please write a correct option (min, S) ')
         
 
         df_final = pd.DataFrame({'ds':df_pred})
@@ -165,23 +164,26 @@ class models:
 
         df_final['y'] = response
 
-        plt.figure(figsize=(10,10))
+        plt.figure(figsize=(10,6))
         plt.plot(df_final['ds'], response, label='Predicted future labels', color='r')
-        plt.plot(df['ds'], df['y'], label = 'Real price', color='b')
+        plt.plot(df['ds'], df['y'], label = 'Real price')
         plt.title(f'Prediction since using XGBoost')
         plt.ylabel('Price')
         plt.xlabel('Date')
+        plt.grid(True)
         plt.show()
 
         df_real = pd.DataFrame({'ds':df['ds'],'y':df['y']})
 
         df_result = pd.concat([df_real, df_final], ignore_index=True)
 
-        return df_result[['ds', 'y']]
+        df_result = df_result[['ds', 'y']]
+
+        return df, df_final
 
 
 
-    def XGBoost_model_bootstrap(data, time):
+    def XGBoost_model_bootstrap(self, data, time):
         data.columns = ['ds', 'y']
         df = pd.DataFrame()
 
@@ -231,7 +233,7 @@ class models:
 
         for i in range(n_bootstrap):
             sample_idx = np.random.choice(len(X), size=len(X), replace=True)
-            model_i = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
+            model_i = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.2)
             model_i.fit(X.iloc[sample_idx], y.iloc[sample_idx])
             bootstrap_preds[i] = model_i.predict(X_final)
 
@@ -265,18 +267,51 @@ class models:
 
 
 class meassures():
-    def data_predict(data, model, crypto, time):
-        model.columns = ['ds', 'predict price']
+    def data_predict(self, model_pred, time, crypto ):
 
-        start_time = model['ds'].min()
-        end_time = model['ds'].max()
+        model = model_pred.copy()
+        model = model.rename(columns={'y':'yhat'})
+        model = model[['ds', 'yhat']]
 
-        # real_data = get_data_crypto().download_data(start_time=start_time, end_time=end_time, crypto=crypto, time=time)
+        model = model[model['ds']>=model['ds'].max() - pd.Timedelta(minutes=24*60)]
+        data = get_data_crypto().download_data(start_time =model['ds'].max() - pd.Timedelta(minutes=24*60) , end_time=model['ds'].max(), crypto=crypto, time=time)
         data.columns = ['ds','real price']
+
+        if time == 'min':
+            model['ds'] = model['ds'].dt.round(time)
+            data['ds'] = data['ds'].dt.round(time)
+            
+        elif time == 'S':
+            model['ds'] = model['ds'].dt.round(time)
+            data['ds'] = data['ds'].dt.round(time)
+        else:
+            raise ValueError(f'Please write a correct option for the time {time}')
 
         df = pd.merge(left=model, right=data, on='ds', how='left')
         df = df.dropna(axis=0).reset_index(drop=True)
 
-        df['Accuracy'] = round(df['predict price'] / df['real price'], 2)
+        df['difference'] = np.absolute(df['yhat'] - df['real price'])
+        df['mismatch'] = df['difference']/df['real price']
+
+        difference_shadow = round(np.trapz(df['difference'], x=mdates.date2num(df['ds'])), 2)
+        mismatch_percent = round(np.trapz(df['mismatch'], x=mdates.date2num(df['ds'])), 4)
+        percent_rent = round( df['yhat'][df['ds'] == df['ds'].min()][0]*2/100  ,2)
+
+        plt.figure(figsize=(10,6))
+        plt.plot(df['ds'], df['yhat'], c='r', label = 'Predict Price' )
+        # plt.plot(df['ds'], df['yhat_lower'], c='#FF6666', label = 'Predict Price lower' )
+        # plt.plot(df['ds'], df['yhat_upper'], c='#990000', label = 'Predict Price upper' )
+
+        plt.plot(df['ds'], df['real price'], c='g', label='Real Price')
+
+        plt.fill_between(df['ds'], df['real price'], df['yhat'], alpha=0.3, label='Area betwen')
+
+        plt.title(f' Accuracy {1-mismatch_percent}, Min Profit: {percent_rent}\n  Mismatch in dollars: {difference_shadow} Error percent: {mismatch_percent}')
+        plt.ylabel(f'Price of {crypto}')
+        plt.legend()
+        plt.grid(True)
+        plt.xticks(rotation=45)
+        plt.show()
         
-        return df
+        
+        return df   
