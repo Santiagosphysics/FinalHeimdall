@@ -119,7 +119,7 @@ class models:
 
 
 
-    def XGBoost_model(self, data, time ):
+    def XGBoost_plot(self, data, time ):
         data.columns = ['ds', 'y']
         df = pd.DataFrame()
 
@@ -177,6 +177,58 @@ class models:
 
         df_result = pd.concat([df_real, df_final], ignore_index=True)
 
+        df_result = df_result[['ds', 'y']]
+
+        return df, df_final
+    
+
+    def XGBoost_model(self, data, time ):
+        data.columns = ['ds', 'y']
+        df = pd.DataFrame()
+
+        if time == 'S':
+            df['second']= data['ds'].dt.second
+        
+        df['minute'] = data['ds'].dt.minute
+        df['hour'] = data['ds'].dt.hour
+        df['dayofweek'] = data['ds'].dt.dayofweek
+        df['day'] = data['ds'].dt.day
+
+        df['y'] = round(data['y'], 3)
+        df['ds'] = data['ds']
+
+        X = df[['minute', 'hour', 'day', 'dayofweek']]
+        y = df['y']
+
+        model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
+        model.fit(X, y)
+
+        if time == 'min':
+            df_pred = pd.date_range(start=df['ds'].max() + pd.Timedelta(minutes=1), periods=24*60, freq='min')
+        elif time == 'S':
+            df_pred = pd.date_range(start=df['ds'].max() + pd.Timedelta(seconds=1), periods=24*60*60, freq='S')
+        else:
+            raise ValueError('Please write a correct option (min, S) ')
+        
+
+        df_final = pd.DataFrame({'ds':df_pred})
+
+        df_final['minute'] =    df_final['ds'].dt.minute
+        df_final['hour'] =      df_final['ds'].dt.hour
+        df_final['dayofweek'] = df_final['ds'].dt.dayofweek
+        df_final['day'] =       df_final['ds'].dt.day
+
+        if time == 's':
+            df_final['second'] = df_final['ds'].dt.second
+            X_final = df_final[['second', 'minute', 'hour', 'dayofweek', 'day']]
+        else:
+            X_final = df_final[['minute', 'hour', 'day', 'dayofweek']]
+        response = model.predict(X_final)
+
+        df_final['y'] = response
+
+        df_real = pd.DataFrame({'ds':df['ds'],'y':df['y']})
+        df_result = pd.concat([df_real, df_final], ignore_index=True)
         df_result = df_result[['ds', 'y']]
 
         return df, df_final
@@ -299,9 +351,6 @@ class meassures():
 
         plt.figure(figsize=(10,6))
         plt.plot(df['ds'], df['yhat'], c='r', label = 'Predict Price' )
-        # plt.plot(df['ds'], df['yhat_lower'], c='#FF6666', label = 'Predict Price lower' )
-        # plt.plot(df['ds'], df['yhat_upper'], c='#990000', label = 'Predict Price upper' )
-
         plt.plot(df['ds'], df['real price'], c='g', label='Real Price')
 
         plt.fill_between(df['ds'], df['real price'], df['yhat'], alpha=0.3, label='Area betwen')
@@ -312,6 +361,6 @@ class meassures():
         plt.grid(True)
         plt.xticks(rotation=45)
         plt.show()
-        
+
         
         return df   

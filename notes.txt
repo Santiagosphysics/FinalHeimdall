@@ -1,0 +1,14 @@
+7 mayo
+Se ha logrado graficar dos predicciones, pensando en conocer con mayor confianza el sentimiento del activo. 
+Si ambas gráficas suben es muy probable que el precio suba. Esto se debe tener en cuenta ya que solo ambos 
+entrenamientos nos permiten conocer el comportamiento del precio considerando posibles fluctuaciones.
+
+Hacer un solo entrenamiento con mayor precisión puede desembocar en fluctuaciones inesperadas.
+
+Tarea: 
+    . Genere funciones para optimizar el número de líneas de código
+        . Realizar un df considerando el mismatch (considere calcular el área sombreada para mayor precisión) por  hora.
+        . Porcentualmente el mismatch cuánto corresponde por hora.  
+        . Realizar un df con el predicciones desde el 1 hasta el 30 de abril, y realice las dos tareas anteriores con 
+        con ese mismo df.
+        . Encuentre el número de días óptimos para realizar el entrenamiento fino y grueso.
