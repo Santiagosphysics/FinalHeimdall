@@ -58,7 +58,40 @@ class get_data_crypto:
 
         return df
 
+    def download_data_volume(self, start_time, end_time, crypto, time):
 
+        data_time = {'min':Client.KLINE_INTERVAL_1MINUTE,'S':Client.KLINE_INTERVAL_1SECOND,'hours':Client.KLINE_INTERVAL_1HOUR,}
+        if time not in data_time:
+            raise ValueError(f'El parámetro {time} no está en las opciones {data_time}')
+        
+        api_key  = os.getenv("BINANCE_API_KEY")
+        api_secret = os.getenv("BINANCE_API_SECRET")
+
+        client = Client(api_key, api_secret)
+        start_time_ms = int(pd.Timestamp(start_time).timestamp()*1000)
+        end_time_ms = int(pd.Timestamp(end_time).timestamp()*1000)
+
+        all_candles = []
+
+        current_start_time = start_time_ms
+
+        while current_start_time < end_time_ms:
+            
+            candles = client.get_klines(symbol=crypto, interval = data_time[time], startTime=current_start_time, endTime=end_time_ms, limit = 1000)
+            if not candles:
+                break
+
+            all_candles.extend(candles)
+            current_start_time = candles[-1][6] + 1 
+
+        columns = [ 'open_time', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore']
+        
+        df = pd.DataFrame(all_candles, columns=columns)    
+        df['open_time'] = pd.to_datetime(df['open_time'], unit='ms')    
+        df['close_time'] = pd.to_datetime(df['close_time'], unit='ms')
+
+
+        return df
 
     def download_data_cloud(self, start_time, end_time, crypto, time):
 
