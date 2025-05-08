@@ -12,3 +12,4 @@ Tarea:
         . Realizar un df con el predicciones desde el 1 hasta el 30 de abril, y realice las dos tareas anteriores con 
         con ese mismo df.
         . Encuentre el número de días óptimos para realizar el entrenamiento fino y grueso.
+        . Crear modelo para predicción del volumen del mercado
