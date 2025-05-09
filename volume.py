@@ -38,17 +38,18 @@ class volume:
         data = pd.merge(left=third_data, right=first_pred, how='left', on='close_time')
         data = pd.merge(left=data, right=second_pred, how='left', on='close_time')
 
-        data = data.dropna(subset=['volume'], ignore_index=True)
+        data = data.dropna(subset=['Fine Vol', 'Large Vol'], ignore_index=True)
 
-        
-        plt.plot(data['close_time'], data['volume'])
-        plt.plot(data['close_time'], data['Fine Vol'], c='green')
-        plt.plot(data['close_time'], data['Large Vol'], c='black')
-        
+        plt.figure(figsize=(10,6))
+        plt.plot(data['close_time'], data['volume'], label = 'Real Volume')
+        #plt.plot(data['close_time'], data['Fine Vol'], c='green', label = 'Fine Vol')
+        #plt.plot(data['close_time'], data['Large Vol'], c='black', label = 'Large Vol')
+        plt.grid(True)
+        plt.legend()        
 
         plt.show()
 
-        print(data['volume'])
+        print(data)
 
 
     
