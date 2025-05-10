@@ -74,10 +74,10 @@ class indicators:
         print(np.mean(data['Diff Fine']), ' ',np.mean(data['Diff Large']) )
 
 
-        difference_fine = round(np.trapezoid(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
-        difference_large = round(np.trapezoid(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
+        difference_fine = round(np.trapz(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
+        difference_large = round(np.trapz(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
         
-        min_price = round(third_data['Real Price'].min()*2/100 , 2)
+        min_price = round(third_data['Real Price'].min()*2/100 , 2) #Revisar problema ------------------------------------------------
 
         plt.figure(figsize=(10,6))
         plt.plot(data['ds'], data['Fine Pred'], label='Fine prediction', c='black')
@@ -100,11 +100,11 @@ class indicators:
 
 end_time = '2025-03-07 11:58:00'
 
-days_fine_pred = 5
-days_pred = 15
+days_fine_pred = 1
+days_pred = 2
 crypto='BNBUSDT'
-time='S'
+time='min'
 
 
 test_1 = indicators().development_model(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
-#test_1 = indicators().predictions(days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)
+# test_1 = indicators().predictions(days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)

@@ -218,9 +218,6 @@ class models:
     def XGBoost_model(self, data, time ):
         data.columns = ['ds', 'y']
         df = pd.DataFrame()
-
-        if time == 'S':
-            df['second']= data['ds'].dt.second
         
         df['minute'] = data['ds'].dt.minute
         df['hour'] = data['ds'].dt.hour
@@ -230,7 +227,12 @@ class models:
         df['y'] = round(data['y'], 3)
         df['ds'] = data['ds']
 
-        X = df[['minute', 'hour', 'day', 'dayofweek']]
+        if time == 'S':
+            df['second']= data['ds'].dt.second
+            X = df[['second', 'minute', 'hour', 'dayofweek', 'day']]
+
+        else:        
+            X = df[['minute', 'hour', 'day', 'dayofweek']]
         y = df['y']
 
         model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
@@ -251,11 +253,12 @@ class models:
         df_final['dayofweek'] = df_final['ds'].dt.dayofweek
         df_final['day'] =       df_final['ds'].dt.day
 
-        if time == 's':
+        if time == 'S' or time == 's':
             df_final['second'] = df_final['ds'].dt.second
             X_final = df_final[['second', 'minute', 'hour', 'dayofweek', 'day']]
         else:
             X_final = df_final[['minute', 'hour', 'day', 'dayofweek']]
+
         response = model.predict(X_final)
 
         df_final['y'] = response
@@ -275,6 +278,7 @@ class models:
         # Preprocesamiento de características temporales
         if time == 's':
             df['second'] = data['ds'].dt.second
+
         df['minute'] = data['ds'].dt.minute
         df['hour'] = data['ds'].dt.hour
         df['dayofweek'] = data['ds'].dt.dayofweek

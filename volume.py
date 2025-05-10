@@ -2,15 +2,12 @@ from utils import get_data_crypto, models
 import matplotlib.pyplot as plt 
 import pandas as pd 
 
-class volume:
+class VolumeXGBoost:
     def volume_all_variables(self, start_time, end_time, crypto, time):
 
         data = get_data_crypto().download_data_volume(start_time=start_time, end_time=end_time, crypto=crypto, time=time)
         data = data[[ 'close_time', 'close', 'volume', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume','taker_buy_quote_asset_volume']]
         return data
-
-
-
 
     def model_volume(self, end_time, days_fine_pred, days_pred, crypto, time):
         end_time = pd.to_datetime(end_time)
@@ -40,27 +37,29 @@ class volume:
 
         data = data.dropna(subset=['Fine Vol', 'Large Vol'], ignore_index=True)
 
-        plt.figure(figsize=(10,6))
-        plt.plot(data['close_time'], data['volume'], label = 'Real Volume')
-        #plt.plot(data['close_time'], data['Fine Vol'], c='green', label = 'Fine Vol')
-        #plt.plot(data['close_time'], data['Large Vol'], c='black', label = 'Large Vol')
-        plt.grid(True)
-        plt.legend()        
+        # plt.figure(figsize=(10,6))
+        # plt.plot(data['close_time'], data['volume'], label = 'Real Volume')
+        # #plt.plot(data['close_time'], data['Fine Vol'], c='green', label = 'Fine Vol')
+        # #plt.plot(data['close_time'], data['Large Vol'], c='black', label = 'Large Vol')
+        # plt.grid(True)
+        # plt.legend()        
 
-        plt.show()
+        # plt.show()
 
-        print(data)
+        # print(data)
+
+        return data
 
 
     
 
 
-end_time = '2025-03-15 01:00:00'
+# end_time = '2025-03-15 01:00:00'
 
-days_fine_pred = 1
-days_pred = 2
-crypto='ETHUSDT'
-time='min'
+# days_fine_pred = 1
+# days_pred = 2
+# crypto='ETHUSDT'
+# time='min'
 
-test_1 = volume().model_volume(end_time, days_fine_pred, days_pred, crypto, time)
-print(test_1)
+# test_1 = volume().model_volume(end_time, days_fine_pred, days_pred, crypto, time)
+# print(test_1)
