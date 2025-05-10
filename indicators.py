@@ -77,7 +77,7 @@ class indicators:
         difference_fine = round(np.trapezoid(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
         difference_large = round(np.trapezoid(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
         
-        min_price = round(third_data['Real Price'].min(), 2)*2/100
+        min_price = round(third_data['Real Price'].min()*2/100 , 2)
 
         plt.figure(figsize=(10,6))
         plt.plot(data['ds'], data['Fine Pred'], label='Fine prediction', c='black')
@@ -98,11 +98,11 @@ class indicators:
     
 
 
-end_time = '2025-03-15 00:00:00'
+end_time = '2025-03-07 11:58:00'
 
 days_fine_pred = 5
-days_pred = 10
-crypto='ETHUSDT'
+days_pred = 15
+crypto='BNBUSDT'
 time='S'
 
 
