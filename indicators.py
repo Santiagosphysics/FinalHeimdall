@@ -98,12 +98,12 @@ class indicators:
     
 
 
-end_time = '2025-03-07 11:58:00'
+end_time = '2025-04-09 23:00:00'
 
-days_fine_pred = 1
-days_pred = 2
-crypto='BNBUSDT'
-time='min'
+days_fine_pred = 7
+days_pred = 15
+crypto='ETHUSDT'
+time='S'
 
 
 test_1 = indicators().development_model(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
