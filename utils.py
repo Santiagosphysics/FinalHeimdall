@@ -18,7 +18,7 @@ import os
 class get_data_crypto:
     def download_data(self, start_time, end_time, crypto, time):
 
-        data_time = {'min':Client.KLINE_INTERVAL_1MINUTE,'S':Client.KLINE_INTERVAL_1SECOND,'hours':Client.KLINE_INTERVAL_1HOUR,}
+        data_time = {'min':Client.KLINE_INTERVAL_1MINUTE,'S':Client.KLINE_INTERVAL_1SECOND,'hours':Client.KLINE_INTERVAL_1HOUR, 's':Client.KLINE_INTERVAL_1SECOND}
         if time not in data_time:
             raise ValueError(f'El parámetro {time} no está en las opciones {data_time}')
         
@@ -245,13 +245,18 @@ class models:
         else:
             raise ValueError('Please write a correct option (min, S) ')
         
-
         df_final = pd.DataFrame({'ds':df_pred})
 
         df_final['minute'] =    df_final['ds'].dt.minute
         df_final['hour'] =      df_final['ds'].dt.hour
         df_final['dayofweek'] = df_final['ds'].dt.dayofweek
         df_final['day'] =       df_final['ds'].dt.day
+
+
+
+
+
+        
 
         if time == 'S' or time == 's':
             df_final['second'] = df_final['ds'].dt.second
