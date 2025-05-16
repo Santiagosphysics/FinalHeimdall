@@ -8,7 +8,7 @@ import matplotlib.dates as mdates
 import numpy as np  
 
 
-class indicators:
+class ModelIndicators:
     def predictions(self, days_fine_pred, days_pred, crypto, time):
 
         start_time = datetime.datetime.now()
@@ -157,15 +157,14 @@ class indicators:
         return 
 
 
-end_time = '2025-04-11 23:00:00'
+# end_time = '2025-04-12 23:00:00'
 
-days_fine_pred = 5
-days_pred = 10
-crypto='ETHUSDT'
-time='S'
+# days_fine_pred = 1
+# days_pred = 2
+# crypto='ETHUSDT'
+# time='min'
 
 
-# test_1 = indicators().predictions(days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)
-
-# test_1 = indicators().development_model(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
-test_1 = indicators().development_XGBoost_final(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
+# # test_1 = indicators().predictions(days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)
+# # test_1 = indicators().development_model(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
+# test_1 = ModelIndicators().development_XGBoost_final(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)

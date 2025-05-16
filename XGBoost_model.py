@@ -106,7 +106,7 @@ class XGBoost:
         df_final['day'] =       df_final['ds'].dt.day
 
 
-        volume_pred = VolumeXGBoost().model_volume(end_time=df['ds'].max(), days_fine_pred=1, days_pred=2, crypto=crypto, time=time)
+        volume_pred = VolumeXGBoost().model_volume(end_time=df['ds'].max(), days_fine_pred=10, days_pred=1, crypto=crypto, time=time) #No funciona la predicción gruesa
         real_data = get_data_crypto().download_data(start_time=df_final['ds'].min(), end_time=df_final['ds'].max(), crypto=crypto, time=time)
         real_data = real_data.rename(columns={'close_time':'ds', 'close':'Real Price'})
 
@@ -141,13 +141,13 @@ class XGBoost:
         return df, df_final
 
 
-start_time = '2025-03-14 00:00:00'
-end_time = '2025-03-15 01:00:00'
+# start_time = '2025-03-14 00:00:00'
+# end_time = '2025-03-15 01:00:00'
 
-days_fine_pred = 1
-days_pred = 2
-crypto='ETHUSDT'
-time='s'
+# days_fine_pred = 1
+# days_pred = 2
+# crypto='ETHUSDT'
+# time='s'
 
 # data = get_data_crypto().download_data_volume(start_time=start_time, end_time=end_time, crypto=crypto, time=time)
 # test_1 = XGBoost().XGBoost_final(data=data, crypto=crypto, time=time)
