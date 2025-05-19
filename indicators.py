@@ -3,9 +3,14 @@ from XGBoost_model import XGBoost
 
 import pandas as pd 
 import datetime
+import numpy as np  
+
 import matplotlib.pyplot as plt 
 import matplotlib.dates as mdates
-import numpy as np  
+import cv2
+
+from io import BytesIO
+from PIL import Image
 
 
 class ModelIndicators:
@@ -131,14 +136,35 @@ class ModelIndicators:
 
         data = data.dropna(subset=['Diff Fine', 'Diff Large'], ignore_index=True)
 
-        print(np.mean(data['Diff Fine']), ' ',np.mean(data['Diff Large']) )
+        #print(np.mean(data['Diff Fine']), ' ',np.mean(data['Diff Large']) )
 
 
-        difference_fine = round(np.trapz(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
-        difference_large = round(np.trapz(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
+        #difference_fine = round(np.trapz(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
+        #difference_large = round(np.trapz(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
         
-        min_price = round(third_data['Real Price'].min()*2/100 , 2) #Revisar problema ------------------------------------------------
+        #min_price = round(third_data['Real Price'].min()*2/100 , 2) #Revisar problema ------------------------------------------------
 
+        #plt.figure(figsize=(10,6))
+        #plt.plot(data['ds'], data['Fine Pred'], label='Fine prediction', c='black')
+        #plt.plot(data['ds'], data['Large Pred'], label = 'Large prediction', c='r')
+        #plt.plot(data['ds'], data['Real Price'], label = 'Real Price', c='green')
+
+        #plt.fill_between(data['ds'], data['Fine Pred'], data['Real Price'], label='Diff Real VS Fine P', alpha=0.2)
+        #plt.fill_between(data['ds'], data['Large Pred'], data['Real Price'], label='Diff Real VS Large P', alpha = 0.2)
+
+        #plt.title(f"Diff Fine: {difference_fine}, Diff Large: {difference_large}\n Min Profit {min_price}" )
+        #plt.ylabel('Price')
+        #plt.xlabel(f"Prediction since {third_data['ds'].min()} until {third_data['ds'].max()}")
+        #plt.legend()
+        #plt.grid(True)
+        #plt.show()
+
+        return data
+    
+    def CreateImages(self, data):
+        difference_fine = round(np.trapezoid(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
+        difference_large = round(np.trapezoid(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
+        
         plt.figure(figsize=(10,6))
         plt.plot(data['ds'], data['Fine Pred'], label='Fine prediction', c='black')
         plt.plot(data['ds'], data['Large Pred'], label = 'Large prediction', c='r')
@@ -147,24 +173,56 @@ class ModelIndicators:
         plt.fill_between(data['ds'], data['Fine Pred'], data['Real Price'], label='Diff Real VS Fine P', alpha=0.2)
         plt.fill_between(data['ds'], data['Large Pred'], data['Real Price'], label='Diff Real VS Large P', alpha = 0.2)
 
-        plt.title(f"Diff Fine: {difference_fine}, Diff Large: {difference_large}\n Min Profit {min_price}" )
+        plt.title(f"Diff Fine: {difference_fine}, Diff Large: {difference_large}\n Min Profit {0}" )
         plt.ylabel('Price')
-        plt.xlabel(f"Prediction since {third_data['ds'].min()} until {third_data['ds'].max()}")
+        plt.xlabel(f"Prediction since {data['ds'].min()} until {data['ds'].max()}")
         plt.legend()
         plt.grid(True)
-        plt.show()
-
-        return 
 
 
-# end_time = '2025-04-12 23:00:00'
 
-# days_fine_pred = 1
-# days_pred = 2
-# crypto='ETHUSDT'
-# time='min'
+
+
+
+    
+    def ManyPlots(self, since_date, days_fine_pred, days_pred, crypto, time ):
+        
+        date = pd.to_datetime(since_date)
+        today = pd.Timestamp.now()
+
+        diff_days = (today - date).days
+
+        test_days = {}
+
+        diff_days = 3 #Test for dicress the time, only for testing 
+
+        for i in range(diff_days):
+            date = date + pd.Timedelta(days=1)
+            test_days[f'day_{i+1}'] = ModelIndicators().development_XGBoost_final(end_time=date, days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)
+            test_days[f'image_{i+1}'] = ModelIndicators().CreateImages(test_days[f'day_{i+1}'])
+
+        
+
+        print(test_days)
+        return test_days
+
+
+
+end_time = '2025-04-12 23:00:00'
+days_fine_pred = 0.1
+days_pred = 0.2
+crypto='ETHUSDT'
+time='min'
 
 
 # # test_1 = indicators().predictions(days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)
-# # test_1 = indicators().development_model(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
-# test_1 = ModelIndicators().development_XGBoost_final(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
+
+#test_1 = ModelIndicators().development_model(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
+#test_1 = ModelIndicators().development_XGBoost_final(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
+
+#image = ModelIndicators().CreateImages(data=test_1)
+
+#test_1 = ModelIndicators().ManyPlots(since_date=end_time, crypto=crypto, time = time, days_fine_pred=days_fine_pred, days_pred = days_pred)
+
+
+test = ModelIndicators().ManyPlots(since_date=end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto=crypto, time=time)

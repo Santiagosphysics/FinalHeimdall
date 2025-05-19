@@ -13,3 +13,13 @@ Tarea:
         con ese mismo df.
         . Encuentre el número de días óptimos para realizar el entrenamiento fino y grueso.
         . Crear modelo para predicción del volumen del mercado
+
+May 8
+I could add plots in the last predictions, this was made for know how it's the development of the model and 
+how long it's of the real price, plus, in the plot there are a little description about the minimum difference for profit
+and the mismatch in every prediction.
+
+May 19 
+I had troubles with the time, now I'm testing the development of the model XGBoost
+Task:
+    . Create many images for comparative betwen many days

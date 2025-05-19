@@ -18,7 +18,7 @@ import os
 class get_data_crypto:
     def download_data(self, start_time, end_time, crypto, time):
 
-        data_time = {'min':Client.KLINE_INTERVAL_1MINUTE,'S':Client.KLINE_INTERVAL_1SECOND,'hours':Client.KLINE_INTERVAL_1HOUR, 's':Client.KLINE_INTERVAL_1SECOND}
+        data_time = {'min':Client.KLINE_INTERVAL_1MINUTE,'S':Client.KLINE_INTERVAL_1SECOND,'hours':Client.KLINE_INTERVAL_1HOUR,}
         if time not in data_time:
             raise ValueError(f'El parámetro {time} no está en las opciones {data_time}')
         
@@ -151,7 +151,6 @@ class models:
         return data, predict
 
 
-
     def XGBoost_plot(self, data, time ):
         data.columns = ['ds', 'y']
         df = pd.DataFrame()
@@ -218,6 +217,9 @@ class models:
     def XGBoost_model(self, data, time ):
         data.columns = ['ds', 'y']
         df = pd.DataFrame()
+
+        if time == 'S':
+            df['second']= data['ds'].dt.second
         
         df['minute'] = data['ds'].dt.minute
         df['hour'] = data['ds'].dt.hour
@@ -227,12 +229,7 @@ class models:
         df['y'] = round(data['y'], 3)
         df['ds'] = data['ds']
 
-        if time == 'S':
-            df['second']= data['ds'].dt.second
-            X = df[['second', 'minute', 'hour', 'dayofweek', 'day']]
-
-        else:        
-            X = df[['minute', 'hour', 'day', 'dayofweek']]
+        X = df[['minute', 'hour', 'day', 'dayofweek']]
         y = df['y']
 
         model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
@@ -245,6 +242,7 @@ class models:
         else:
             raise ValueError('Please write a correct option (min, S) ')
         
+
         df_final = pd.DataFrame({'ds':df_pred})
 
         df_final['minute'] =    df_final['ds'].dt.minute
@@ -252,18 +250,11 @@ class models:
         df_final['dayofweek'] = df_final['ds'].dt.dayofweek
         df_final['day'] =       df_final['ds'].dt.day
 
-
-
-
-
-        
-
-        if time == 'S' or time == 's':
+        if time == 's':
             df_final['second'] = df_final['ds'].dt.second
             X_final = df_final[['second', 'minute', 'hour', 'dayofweek', 'day']]
         else:
             X_final = df_final[['minute', 'hour', 'day', 'dayofweek']]
-
         response = model.predict(X_final)
 
         df_final['y'] = response
@@ -283,7 +274,6 @@ class models:
         # Preprocesamiento de características temporales
         if time == 's':
             df['second'] = data['ds'].dt.second
-
         df['minute'] = data['ds'].dt.minute
         df['hour'] = data['ds'].dt.hour
         df['dayofweek'] = data['ds'].dt.dayofweek
