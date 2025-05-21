@@ -1,6 +1,6 @@
 
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('TkAgg')
 
 from utils import models, get_data_crypto, meassures
 from XGBoost_model import XGBoost
@@ -8,10 +8,13 @@ from XGBoost_model import XGBoost
 import pandas as pd 
 import datetime
 import numpy as np  
+import math
 
 import matplotlib.pyplot as plt 
 import matplotlib.dates as mdates
 from matplotlib.backends.backend_agg import FigureCanvas
+
+from PIL import Image
 
 class ModelIndicators:
     def predictions(self, days_fine_pred, days_pred, crypto, time):
@@ -162,8 +165,8 @@ class ModelIndicators:
         return data
     
     def CreateImages(self, data):
-        difference_fine = round(np.trapezoid(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
-        difference_large = round(np.trapezoid(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
+        difference_fine = round(np.trapz(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
+        difference_large = round(np.trapz(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
         
         fig = plt.figure(figsize=(10,6))
         canvas = FigureCanvas(fig)
@@ -185,11 +188,11 @@ class ModelIndicators:
         canvas.draw()
 
         width, height = map(int, fig.get_size_inches()*fig.get_dpi())
-        image = np.frombuffer(canvas.tostring_rgb(), dtype='uint8')
-        image = image.reshape(int(height), int(width), 3)
+        image = np.frombuffer(canvas.buffer_rgba(), dtype='uint8')
+        image = image.reshape(int(height), int(width), 4)
+        image = image[:, :, :3]
 
         plt.close(fig)
-        print(image)
         
         return image
 
@@ -203,33 +206,56 @@ class ModelIndicators:
         
         date = pd.to_datetime(since_date)
         today = pd.Timestamp.now()
-
         diff_days = (today - date).days
-
-        print(diff_days)
-
         test_days = {}
 
-        diff_days = 3 #Test for dicress the time, only for testing 
+        # diff_days = 3 #Test for dicress the time, only for testing 
 
         for i in range(diff_days):
             date = date + pd.Timedelta(days=1)
-            print(date, ' First date')
             test_days[f'day_{i+1}'] = ModelIndicators().development_XGBoost_final(end_time=date, days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)
             test_days[f'image_{i+1}'] = ModelIndicators().CreateImages(test_days[f'day_{i+1}'])
+            img = Image.fromarray(test_days[f'image_{i+1}'])
+            img.save(f'./plots/image_{i+1}.png')
 
-        
+        list_img = {name:img for name, img in test_days.items() if 'image' in name}
 
-        print(test_days)
-        return test_days
+        num_images = len(list_img)
+        cols = 3
+        rows = math.ceil(num_images / cols)
+
+        fig, axes = plt.subplots(rows, cols, figsize=(15, 5 * rows))
+
+        # Si hay solo una fila o una columna, convertir a arreglo 2D para evitar errores
+        axes = np.array(axes).reshape(rows, cols)
+
+        for idx, (key, image) in enumerate(list_img.items()):
+            row = idx // cols
+            col = idx % cols
+            axes[row, col].imshow(image.astype(np.uint8))
+            axes[row, col].axis('off')
+            axes[row, col].set_title(key)
+
+        # Ocultar los ejes sobrantes si el número de imágenes no llena toda la grilla
+        for idx in range(num_images, rows * cols):
+            row = idx // cols
+            col = idx % cols
+            axes[row, col].axis('off')
+        fig.savefig("full_grid_plot.png")
+
+
+        plt.tight_layout()
+        plt.show()
 
 
 
-end_time = '2025-04-12 23:00:00'
-days_fine_pred = 0.01
-days_pred = 0.05
-crypto='ETHUSDT'
-time='min'
+
+# end_time = '2025-04-12 23:00:00'
+# days_fine_pred = 0.01
+# days_pred = 0.05
+# crypto='ETHUSDT'
+# time='min'
+
 
 
 # # test_1 = indicators().predictions(days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)
@@ -242,4 +268,4 @@ time='min'
 #test_1 = ModelIndicators().ManyPlots(since_date=end_time, crypto=crypto, time = time, days_fine_pred=days_fine_pred, days_pred = days_pred)
 
 
-test = ModelIndicators().ManyPlots(since_date=end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto=crypto, time=time)
+# test = ModelIndicators().ManyPlots(since_date=end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto=crypto, time=time)
