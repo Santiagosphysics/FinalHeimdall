@@ -1,3 +1,7 @@
+
+import matplotlib
+matplotlib.use('Agg')
+
 from utils import models, get_data_crypto, meassures
 from XGBoost_model import XGBoost
 
@@ -7,11 +11,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt 
 import matplotlib.dates as mdates
-import cv2
-
-from io import BytesIO
-from PIL import Image
-
+from matplotlib.backends.backend_agg import FigureCanvas
 
 class ModelIndicators:
     def predictions(self, days_fine_pred, days_pred, crypto, time):
@@ -165,19 +165,33 @@ class ModelIndicators:
         difference_fine = round(np.trapezoid(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
         difference_large = round(np.trapezoid(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
         
-        plt.figure(figsize=(10,6))
-        plt.plot(data['ds'], data['Fine Pred'], label='Fine prediction', c='black')
-        plt.plot(data['ds'], data['Large Pred'], label = 'Large prediction', c='r')
-        plt.plot(data['ds'], data['Real Price'], label = 'Real Price', c='green')
+        fig = plt.figure(figsize=(10,6))
+        canvas = FigureCanvas(fig)
+        ax = fig.add_subplot(111)
 
-        plt.fill_between(data['ds'], data['Fine Pred'], data['Real Price'], label='Diff Real VS Fine P', alpha=0.2)
-        plt.fill_between(data['ds'], data['Large Pred'], data['Real Price'], label='Diff Real VS Large P', alpha = 0.2)
+        ax.plot(data['ds'], data['Fine Pred'], label='Fine prediction', c='black')
+        ax.plot(data['ds'], data['Large Pred'], label = 'Large prediction', c='r')
+        ax.plot(data['ds'], data['Real Price'], label = 'Real Price', c='green')
 
-        plt.title(f"Diff Fine: {difference_fine}, Diff Large: {difference_large}\n Min Profit {0}" )
-        plt.ylabel('Price')
-        plt.xlabel(f"Prediction since {data['ds'].min()} until {data['ds'].max()}")
-        plt.legend()
-        plt.grid(True)
+        ax.fill_between(data['ds'], data['Fine Pred'], data['Real Price'], label='Diff Real VS Fine P', alpha=0.2)
+        ax.fill_between(data['ds'], data['Large Pred'], data['Real Price'], label='Diff Real VS Large P', alpha = 0.2)
+
+        ax.set_title(f"Diff Fine: {difference_fine}, Diff Large: {difference_large}\n" )
+        ax.set_ylabel('Price')
+        ax.set_xlabel(f"Prediction since {data['ds'].min()} until {data['ds'].max()}")
+        ax.legend()
+        ax.grid(True)
+
+        canvas.draw()
+
+        width, height = map(int, fig.get_size_inches()*fig.get_dpi())
+        image = np.frombuffer(canvas.tostring_rgb(), dtype='uint8')
+        image = image.reshape(int(height), int(width), 3)
+
+        plt.close(fig)
+        print(image)
+        
+        return image
 
 
 
@@ -192,12 +206,15 @@ class ModelIndicators:
 
         diff_days = (today - date).days
 
+        print(diff_days)
+
         test_days = {}
 
         diff_days = 3 #Test for dicress the time, only for testing 
 
         for i in range(diff_days):
             date = date + pd.Timedelta(days=1)
+            print(date, ' First date')
             test_days[f'day_{i+1}'] = ModelIndicators().development_XGBoost_final(end_time=date, days_fine_pred=days_fine_pred, days_pred=days_pred, crypto=crypto, time=time)
             test_days[f'image_{i+1}'] = ModelIndicators().CreateImages(test_days[f'day_{i+1}'])
 
@@ -209,8 +226,8 @@ class ModelIndicators:
 
 
 end_time = '2025-04-12 23:00:00'
-days_fine_pred = 0.1
-days_pred = 0.2
+days_fine_pred = 0.01
+days_pred = 0.05
 crypto='ETHUSDT'
 time='min'
 
