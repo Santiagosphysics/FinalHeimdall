@@ -211,9 +211,7 @@ class ModelIndicators:
         data = data.dropna().reset_index(drop=True)
 
         return data
-    
-
-    
+        
     def CreateImages(self, data, ShowImage):
         difference_fine = round(np.trapz(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
         difference_large = round(np.trapz(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
@@ -297,9 +295,6 @@ class ModelIndicators:
         plt.close(fig)
         
         return image
-
-
-
     
     def ManyPlots(self, SinceDate, RealPrice, FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time ):
         
@@ -343,7 +338,6 @@ class ModelIndicators:
         plt.show()
         fig.savefig("full_grid_plot.png")
 
-        display(PILImage.open("full_grid_plot.png"))
-        print('Its Working :)')
+        #display(PILImage.open("full_grid_plot.png"))
 
         return test_days
