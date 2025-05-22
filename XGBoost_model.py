@@ -106,14 +106,14 @@ class XGBoost:
         df_final['day'] =       df_final['ds'].dt.day
 
 
-        volume_pred = VolumeXGBoost().model_volume(end_time=df['ds'].max(), days_fine_pred=10, days_pred=1, crypto=crypto, time=time) #No funciona la predicción gruesa
-        real_data = get_data_crypto().download_data(start_time=df_final['ds'].min(), end_time=df_final['ds'].max(), crypto=crypto, time=time)
-        real_data = real_data.rename(columns={'close_time':'ds', 'close':'Real Price'})
+        volume_pred = VolumeXGBoost().model_volume(end_time=df['ds'].max(), days_fine_pred=7, crypto=crypto, time=time) #---------------------------------------------0.1 for testing, fot another exercise remember change it fo at least 7
+        #real_data = get_data_crypto().download_data(start_time=df_final['ds'].min(), end_time=df_final['ds'].max(), crypto=crypto, time=time)
+        #real_data = real_data.rename(columns={'close_time':'ds', 'close':'Real Price'})
 
-        df_final = pd.merge(left=df_final, right=real_data, how='left', on='ds')
+        #df_final = pd.merge(left=df_final, right=real_data, how='left', on='ds')
 
         df_final['volume'] = volume_pred['Fine Vol']
-        df_final = df_final.dropna(axis=0, ignore_index=True)
+        df_final = df_final.dropna(axis=0).reset_index(drop=True)
 
         if time == 'S' or time == 's':
             df_final['second'] = df_final['ds'].dt.second
@@ -121,22 +121,7 @@ class XGBoost:
         else:
             X_final = df_final[['minute', 'hour', 'day', 'dayofweek', 'volume']]
 
-        df_final['Pred Price'] = model.predict(X_final)
-
-        df_final['Diff Fine'] = np.absolute(df_final['Real Price'] - df_final['Pred Price'])
-  
-        difference_fine = round(np.trapz(df_final['Diff Fine'], x=mdates.date2num(df_final['ds'])), 2)
-
-        # plt.plot(df_final['ds'], df_final['Pred Price'], label='Pred Price')
-        # plt.plot(df_final['ds'], df_final['Real Price'], c='green', label='Real Price')
-
-        # plt.fill_between(df_final['ds'], df_final['Real Price'], df_final['Pred Price'], alpha=0.3)
-        # plt.title(f"Diff Fine: {difference_fine}" )
-        # plt.ylabel('Price')
-        # plt.xlabel(f"Prediction since {df_final['ds'].min()} until {df_final['ds'].max()}")
-        # plt.legend()
-
-        # plt.show()
+        df_final['Pred Price'] = model.predict(X_final)        
 
         return df, df_final
 

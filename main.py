@@ -1,12 +1,21 @@
 from indicators import ModelIndicators
  
+SinceDate = '2025-05-20 23:00:00'
  
-end_time = '2025-04-11 23:00:00'
- 
-days_fine_pred = 1
-days_pred = 2
 crypto='ETHUSDT'
 time='min'
- 
- 
-test_1 = ModelIndicators().development_XGBoost_final(end_time = end_time, days_fine_pred=days_fine_pred, days_pred = days_pred, crypto = crypto, time = time)
+
+FirstTime= 0.5
+SecondTime=0.10
+ThirdTime= 0.15
+FourthTime=0.20
+FifthTime= 0.25
+
+RealPrice = 'off'
+
+test = ModelIndicators().ManyPlots(SinceDate=SinceDate, FirstTime=FirstTime, SecondTime=SecondTime, 
+                                   ThirdTime=ThirdTime, FourthTime=FourthTime, FifthTime=FifthTime, 
+                                   crypto=crypto, time=time, RealPrice=RealPrice)
+#test = ModelIndicators().predictions(FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time)
+#test = ModelIndicators().XGBoostFinalFivePreds(end_time, FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time)
+#plot_1 = ModelIndicators().CreateImagesFivePreds(data=test, RealPrice='off', ShowImage='on')

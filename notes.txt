@@ -23,3 +23,12 @@ May 19
 I had troubles with the time, now I'm testing the development of the model XGBoost
 Task:
     . Create many images for comparative betwen many days
+
+May 20
+All task was made
+
+New task
+    . It's necesary to do the hand validation for certenly about accuracy of the models
+    . RMSE, R2 and anothers stadistics for validation
+    . Create a plan for investing
+    
