@@ -396,3 +396,31 @@ class meassures():
 
         
         return df   
+
+    def testing(test, time_in, time_out, end_time):
+
+        if time_out < time_in:
+            raise ValueError(f'Time out {time_out} should be bigger than Time in {time_in} ')
+
+
+        end_time = pd.to_datetime(end_time)
+
+        time_in = pd.to_datetime(time_in).time()
+        time_in = end_time.replace(hour=time_in.hour, minute=time_in.minute, second=time_in.second, microsecond=time_in.microsecond)
+
+        time_out = pd.to_datetime(time_out).time()
+        time_out = end_time.replace(hour=time_out.hour, minute=time_out.minute, second=time_out.second, microsecond=time_out.microsecond)
+
+        time_in = str(time_in)
+        time_out = str(time_out)
+
+        real_price = test[test['ds'] == time_in]['Real Price'].values[0]
+        test_price = test[test['ds'] == time_out]['Real Price'].values[0] 
+
+        profit = round(test_price - real_price, 3)
+        percent = round((profit*100)/real_price, 3)
+
+        print('='*50,'>>', f'{profit} Dolars', '<<', '='*50)
+        print('='*50, '>>', f'{percent}% Profit' ,'<<', '='*50)
+
+        

@@ -1,6 +1,5 @@
 
 import matplotlib
-matplotlib.use('TkAgg')
 
 from utils import models, get_data_crypto, meassures
 from XGBoost_model import XGBoost
@@ -39,6 +38,8 @@ class ModelIndicators:
         df3, third_pred = XGBoost().XGBoost_final(data=third_data, time=time, crypto=crypto)
         df4, fourth_pred =XGBoost().XGBoost_final(data=fourth_data, time=time, crypto=crypto)
         df5, fifth_pred = XGBoost().XGBoost_final(data=fifth_data, time=time, crypto=crypto)
+
+        print(len(first_pred), len(second_pred), len(third_pred), len(fourth_pred), len(fifth_pred))
 
         first_pred  = first_pred.rename( columns={'Pred Price' :f'Train {FirstTime} days'})
         second_pred = second_pred.rename(columns= {'Pred Price':f'Train {SecondTime} days'})
@@ -251,6 +252,9 @@ class ModelIndicators:
         return image
     
     def CreateImagesFivePreds(self, data, RealPrice, ShowImage):
+        ShowImage = ShowImage.lower()
+        RealPrice = RealPrice.lower()
+        
         names_columns = [col for col in data.columns if 'Train' in col]
         
         fig = plt.figure(figsize=(15,6))
@@ -278,12 +282,9 @@ class ModelIndicators:
         ax.set_xlabel(f"Prediction since {data['ds'].min()} until {data['ds'].max()}")
         ax.legend()
         ax.grid(True)
-        if ShowImage == 'on':
-            plt.show()
-        elif ShowImage == 'off':
-            print('Img')
-        else:
-            raise ValueError("Please write 'on' if you want to show the real price else write 'off'")
+
+        ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
+        fig.autofmt_xdate()
 
         canvas.draw()
 
@@ -292,10 +293,17 @@ class ModelIndicators:
         image = image.reshape(int(height), int(width), 4)
         image = image[:, :, :3]
 
-        plt.close(fig)
+        if ShowImage == 'on':
+            plt.show()
+            
+        elif ShowImage == 'off':
+            print('Img')
+        else:
+            raise ValueError("Please write 'on' if you want to show the real price else write 'off'")
         
+        plt.close(fig)
         return image
-    
+
     def ManyPlots(self, SinceDate, RealPrice, FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time ):
         
         date = pd.to_datetime(SinceDate)
