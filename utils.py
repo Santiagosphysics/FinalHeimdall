@@ -402,17 +402,19 @@ class meassures():
         if time_out < time_in:
             raise ValueError(f'Time out {time_out} should be bigger than Time in {time_in} ')
 
-
         end_time = pd.to_datetime(end_time)
 
         time_in = pd.to_datetime(time_in).time()
-        time_in = end_time.replace(hour=time_in.hour, minute=time_in.minute, second=time_in.second, microsecond=time_in.microsecond)
+        time_in = end_time.replace(hour=time_in.hour, minute=time_in.minute, second=time_in.second, microsecond= round(time_in.microsecond, 3))
 
         time_out = pd.to_datetime(time_out).time()
         time_out = end_time.replace(hour=time_out.hour, minute=time_out.minute, second=time_out.second, microsecond=time_out.microsecond)
 
-        time_in = str(time_in)
-        time_out = str(time_out)
+        if not (test['ds'] == time_in).any:
+            raise ValueError(f"Please make sure Time_in {time_in} is in Time, remember, Date Time begin in {test['ds'].min()} and finish in {test['ds'].max()}")
+            
+        if not (test['ds'] == time_out).any:
+            raise ValueError(f"Please make sure Time_out {time_out} is in Time, remember, Date Time begin in {test['ds'].min()} and finish in {test['ds'].max()}")
 
         real_price = test[test['ds'] == time_in]['Real Price'].values[0]
         test_price = test[test['ds'] == time_out]['Real Price'].values[0] 
@@ -423,4 +425,4 @@ class meassures():
         print('='*50,'>>', f'{profit} Dolars', '<<', '='*50)
         print('='*50, '>>', f'{percent}% Profit' ,'<<', '='*50)
 
-        
+            
