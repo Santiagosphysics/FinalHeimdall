@@ -1,17 +1,10 @@
-from indicators import ModelIndicators
- 
-crypto='ETHUSDT'
-time='min'
+from utils import meassures
 
-FirstTime=  0.2
-SecondTime= 0.4
-ThirdTime=  0.6
-FourthTime= 0.8
-FifthTime=  1
+data = meassures().ImportData(data_path='./data.csv')
 
+end_time = '2025-02-21 00:00:00'
 
-RealPrice = 'off'
-ShowImage = 'on'
+time_in= '10:03:59.999'
+time_out = '16:00:59.999'
 
-test = ModelIndicators().predictions(FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time)
-plot_2 = ModelIndicators().CreateImagesFivePreds(data=test, RealPrice=RealPrice, ShowImage=ShowImage)
+test = meassures().testing(test=data, time_in=time_in, time_out=time_out, end_time=end_time)
