@@ -31,4 +31,13 @@ New task
     . It's necesary to do the hand validation for certenly about accuracy of the models
     . RMSE, R2 and anothers stadistics for validation
     . Create a plan for investing
-    
+
+May 26
+I have not made:
+    . RMSE, R2 and anothers stadistics for validation
+    . Create a plan for investing
+
+New task:
+    . RMSE, R2 and anothers stadistics for validation
+    . Create a plan for investing
+    . Create manual validation for each pred, it means you can choice the day (right now you can select the hour)

@@ -397,7 +397,7 @@ class meassures():
         
         return df   
 
-    def testing(test, time_in, time_out, end_time):
+    def testing(self, test, time_in, time_out, end_time):
 
         if time_out < time_in:
             raise ValueError(f'Time out {time_out} should be bigger than Time in {time_in} ')
@@ -424,5 +424,10 @@ class meassures():
 
         print('='*50,'>>', f'{profit} Dolars', '<<', '='*50)
         print('='*50, '>>', f'{percent}% Profit' ,'<<', '='*50)
+
+    def ImportData(self, data_path):
+        data = pd.read_csv(data_path)
+        data['ds'] = pd.to_datetime(data['ds'])
+        return data
 
             
