@@ -419,16 +419,23 @@ class meassures():
         real_price = test[test['ds'] == time_in]['Real Price'].values[0]
         test_price = test[test['ds'] == time_out]['Real Price'].values[0] 
 
-        print('*'*50, f'Real Price in: {real_price} at time {time_in}' ,'*'*50)
-        print('*'*50, f'Real Price out: {test_price} at time {time_out}' ,'*'*50)
 
         profit = round(test_price - real_price, 3)
         percent = round((profit*100)/real_price, 3)
 
-        print('='*50,'>>', f'{profit} Dolars', '<<', '='*50)
-        print('='*50, '>>', f'{percent}% Profit' ,'<<', '='*50)
+        data = {'time_in':[time_in],
+                'real_price':[real_price],
+                'time_out':[time_out],
+                'test_price':[test_price],
+                'Profit':[profit],
+                'Percent':[percent]
+                }
 
-        
+        data = pd.DataFrame(data)
+        print(data)
+        return data
+
+
 
     def ImportData(self, data_path):
         data = pd.read_csv(data_path)
