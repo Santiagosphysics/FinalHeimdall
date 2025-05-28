@@ -273,6 +273,17 @@ class ModelIndicators:
 
         ax.axhline(y=mean_price_in, linestyle='--', label='Mean Price In')
 
+        max_mean_price_pred = np.mean([data[training_columns[0]].max(), data[training_columns[1]].max(), data[training_columns[2]].max(), data[training_columns[3]].max(), data[training_columns[4]].max()])
+        
+        if max_mean_price_pred >= mean_price_in+min_profit:
+            ax.axhline(y=mean_price_in+min_profit, linestyle='--', label='Profit', color = 'green')
+            ax.axhspan(mean_price_in, mean_price_in+min_profit, facecolor='green', alpha=0.3 )
+        
+        else:
+            ax.axhline(y=mean_price_in+min_profit, linestyle='--', label='Profit', color = 'red')
+            ax.axhspan(mean_price_in, mean_price_in+min_profit, facecolor='red', alpha=0.3 )
+
+
         RealPrice = RealPrice.lower()
 
         if RealPrice == 'on':
