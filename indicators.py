@@ -251,7 +251,7 @@ class ModelIndicators:
         
         return image
     
-    def CreateImagesFivePreds(self, data, RealPrice, ShowImage):
+    def CreateImagesFivePreds(self, data, RealPrice, ShowImage, crypto):
         ShowImage = ShowImage.lower()
         RealPrice = RealPrice.lower()
         
@@ -261,11 +261,17 @@ class ModelIndicators:
         canvas = FigureCanvas(fig)
         ax = fig.add_subplot(111)
 
+        training_columns = [name for name in data.columns if 'Train' in name]
+        mean_price_in = np.mean([data[training_columns[0]][0], data[training_columns[1]][0], data[training_columns[2]][0], data[training_columns[3]][0], data[training_columns[4]][0]])
+        min_profit = mean_price_in/50
+
         ax.plot(data['ds'], data[names_columns[0]], label = names_columns[0], c='black')
         ax.plot(data['ds'], data[names_columns[1]], label = names_columns[1], c='orange')
         ax.plot(data['ds'], data[names_columns[2]], label = names_columns[2], c='blue')
         ax.plot(data['ds'], data[names_columns[3]], label = names_columns[3], c='gray')
         ax.plot(data['ds'], data[names_columns[4]], label = names_columns[4], c='brown')
+
+        ax.axhline(y=mean_price_in, linestyle='--', label='Mean Price In')
 
         RealPrice = RealPrice.lower()
 
@@ -275,9 +281,8 @@ class ModelIndicators:
             print('With out real price')
         else:
             raise ValueError("Please write 'on' if you want to show the real price else write 'off'")
-
-
-        ax.set_title(f"Many predictions" )
+        
+        ax.set_title(f"Price in: {round(mean_price_in, 2)}, min profit: {round(min_profit, 2)}\n crypto={crypto} " )
         ax.set_ylabel('Price')
         ax.set_xlabel(f"Prediction since {data['ds'].min()} until {data['ds'].max()}")
         ax.legend()
@@ -304,6 +309,21 @@ class ModelIndicators:
         plt.close(fig)
         return image
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def ManyPlots(self, SinceDate, RealPrice, FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time ):
         
         date = pd.to_datetime(SinceDate)
@@ -316,7 +336,7 @@ class ModelIndicators:
         for i in range(diff_days):
             date = date + pd.Timedelta(days=1)
             test_days[f'day_{i+1}'] = ModelIndicators().XGBoostFinalFivePreds(end_time=date, FirstTime=FirstTime, SecondTime=SecondTime, ThirdTime=ThirdTime, FourthTime=FourthTime, FifthTime=FifthTime, crypto=crypto, time=time)
-            test_days[f'image_{i+1}'] = ModelIndicators().CreateImagesFivePreds(test_days[f'day_{i+1}'], ShowImage='off', RealPrice=RealPrice)
+            test_days[f'image_{i+1}'] = ModelIndicators().CreateImagesFivePreds(test_days[f'day_{i+1}'], ShowImage='off', RealPrice=RealPrice, crypto=crypto)
             img = Image.fromarray(test_days[f'image_{i+1}'])
             img.save(f'./plots/image_{i+1}.png')
 

@@ -351,7 +351,7 @@ class models:
 
 
 class meassures():
-    def data_predict(self, model_pred, time, crypto ):
+    def data_predict(self, model_pred, time, crypto):
 
         model = model_pred.copy()
         model = model.rename(columns={'y':'yhat'})
@@ -397,18 +397,38 @@ class meassures():
         
         return df   
 
-    def testing(self, test, time_in, time_out, end_time):
 
-        if time_out < time_in:
-            raise ValueError(f'Time out {time_out} should be bigger than Time in {time_in} ')
+
+
+    def testing(self, test, time_in, time_out, end_time, day, crypto):
+        day = day.lower()
 
         end_time = pd.to_datetime(end_time)
 
         time_in = pd.to_datetime(time_in).time()
-        time_in = end_time.replace(hour=time_in.hour, minute=time_in.minute, second=time_in.second, microsecond= round(time_in.microsecond, 3))
+        time_out = pd.to_datetime(time_out).time()  
 
-        time_out = pd.to_datetime(time_out).time()
-        time_out = end_time.replace(hour=time_out.hour, minute=time_out.minute, second=time_out.second, microsecond=time_out.microsecond)
+        if day == 'first':
+            time_in = end_time.replace(hour=time_in.hour, minute=time_in.minute, second=time_in.second, microsecond= time_in.microsecond)
+            time_out = end_time.replace(hour=time_out.hour, minute=time_out.minute, second=time_out.second, microsecond=time_out.microsecond)
+
+        elif day == 'second':
+            time_in = end_time.replace(day=end_time.day+1, hour=time_in.hour, minute=time_in.minute, second=time_in.second, microsecond= time_in.microsecond)
+            time_out = end_time.replace( day=end_time.day+1, hour=time_out.hour, minute=time_out.minute, second=time_out.second, microsecond=time_out.microsecond)
+
+        else:
+            raise ValueError(f"Please write the correct option for day (first or second)")
+        
+
+        if time_out < time_in:
+            raise ValueError(f'Time out {time_out} should be bigger than Time in {time_in} ')
+        
+        if end_time > time_in:
+            raise ValueError(f"End Time {end_time} cant be bigger than Time In {time_in}")
+        
+        if end_time > time_out:
+            raise ValueError(f"End Time {end_time} can be bigger than Time Out {time_out} ")
+        
 
         if not (test['ds'] == time_in).any:
             raise ValueError(f"Please make sure Time_in {time_in} is in Time, remember, Date Time begin in {test['ds'].min()} and finish in {test['ds'].max()}")
@@ -419,20 +439,35 @@ class meassures():
         real_price = test[test['ds'] == time_in]['Real Price'].values[0]
         test_price = test[test['ds'] == time_out]['Real Price'].values[0] 
 
+        training_columns = [name for name in test.columns if 'Train' in name]
+        
+        pred_price = test[test['ds'] == time_in]
+        pred_price_in = np.mean([pred_price[training_columns[0]], pred_price[training_columns[1]], pred_price[training_columns[2]], pred_price[training_columns[3]], pred_price[training_columns[4]]])
+
+        pred_price_out = test[test['ds'] == time_out]
+        pred_price_out = np.mean([pred_price_out[training_columns[0]], pred_price_out[training_columns[1]], pred_price_out[training_columns[2]], pred_price_out[training_columns[3]], pred_price_out[training_columns[4]]])
 
         profit = round(test_price - real_price, 3)
         percent = round((profit*100)/real_price, 3)
 
-        data = {'time_in':[time_in],
-                'real_price':[real_price],
-                'time_out':[time_out],
-                'test_price':[test_price],
-                'Profit':[profit],
-                'Percent':[percent]
+        data = {'Time in':[time_in],
+                'crypto':[crypto],
+                'Initial Price Real':[real_price],
+                'Initial Price Pred':[pred_price_in],
+                'Init Diff':[pred_price_in - real_price],
+                'Status':[None],
+                'Final Price Real':[test_price],   
+                'Final Price Pred':[pred_price_out],
+                'Final Diff':[pred_price_out - test_price],
+                'Time Out':[time_out],
+                'Hours Op': [time_out - time_in],
+                'Real Profit':[profit],
+                'Pred Profit':[pred_price_out - pred_price_in],
+                'Percent':[f'{percent}%'],
                 }
 
         data = pd.DataFrame(data)
-        print(data)
+
         return data
 
 
