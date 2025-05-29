@@ -212,7 +212,99 @@ class ModelIndicators:
         data = data.dropna().reset_index(drop=True)
 
         return data
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ****************************************** TESTING *******************************************************
+# *****************************************************************************************************************************************************
+
+
+    def XGBoostTimeReduce(self, end_time, FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time):
+
+        end_time = pd.to_datetime(end_time)
+
+        first_time = end_time - pd.Timedelta(minutes  = FirstTime*24*60)
+        second_time = end_time - pd.Timedelta(minutes = SecondTime*24*60)
+        third_time = end_time - pd.Timedelta(minutes  = ThirdTime*24*60 )
+        fourth_time = end_time - pd.Timedelta(minutes = FourthTime*24*60)
+        fifth_time = end_time - pd.Timedelta(minutes   = FifthTime*24*60)
+
+        future_time = end_time + pd.Timedelta(minutes = 24*60)
+
+        fifth_data  = get_data_crypto().download_data_volume(start_time= fifth_time, end_time=end_time, crypto=crypto, time=time)
+          
+        fourth_data = fifth_data[fifth_data['ds'] >= fourth_time].copy()
+        third_data = fifth_data[fifth_data['ds'] >= third_time].copy()
+        second_data = fifth_data[fifth_data['ds'] >= second_time].copy()
+        first_data = fifth_data[fifth_data['ds'] >= first_time].copy()
+
+        real_data = get_data_crypto().download_data(start_time=end_time, end_time= future_time, crypto=crypto, time=time)
+
+        real_data = real_data.rename(columns={'close_time':'ds','close':'Real Price'})
+
+        df1, first_pred =  XGBoost().XGBoost_final(data=first_data, time=time, crypto=crypto)
+        df2, second_pred= XGBoost().XGBoost_final(data=second_data, time=time, crypto=crypto)
+        df3, third_pred = XGBoost().XGBoost_final(data=third_data, time=time, crypto=crypto)
+        df4, fourth_pred =XGBoost().XGBoost_final(data=fourth_data, time=time, crypto=crypto)
+        df5, fifth_pred = XGBoost().XGBoost_final(data=fifth_data, time=time, crypto=crypto)
+
+        first_pred  = first_pred.rename( columns={'Pred Price' :f'Train {FirstTime} days'})
+        second_pred = second_pred.rename(columns= {'Pred Price':f'Train {SecondTime} days'})
+        third_pred  = third_pred.rename(columns= {'Pred Price' :f'Train {ThirdTime} days'})
+        fourth_pred = fourth_pred.rename(columns= {'Pred Price':f'Train {FourthTime} days'})
+        fifth_pred  = fifth_pred.rename(columns= {'Pred Price' :f'Train {FifthTime} days'})
+
+        first_pred = first_pred[['ds', f'Train {FirstTime} days']]
+        second_pred = second_pred[['ds', f'Train {SecondTime} days']] 
+        third_pred  = third_pred[['ds', f'Train {ThirdTime} days']] 
+        fourth_pred = fourth_pred[['ds', f'Train {FourthTime} days']] 
+        fifth_pred  = fifth_pred[['ds', f'Train {FifthTime} days']] 
+
+        data = pd.merge(left=real_data, right = second_pred, on='ds',how='left')
+        data = pd.merge(left=data, right=first_pred, on='ds', how='left')
+        data = pd.merge(left=data, right=third_pred, on='ds', how='left')
+        data = pd.merge(left=data, right=fourth_pred, on='ds', how='left')
+        data = pd.merge(left=data, right=fifth_pred, on='ds', how='left')
+
+
+        data['Diff Fine'] = np.absolute(data['Real Price'] - data[f'Train {SecondTime} days'])
+        data['Diff Large'] = np.absolute(data['Real Price'] - data[f'Train {FourthTime} days'])
+
+        data = data.dropna().reset_index(drop=True)
+
+        return data
+    
+
+# *****************************************************************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
     def CreateImages(self, data, ShowImage):
         difference_fine = round(np.trapz(data['Diff Fine'], x=mdates.date2num(data['ds'])), 2)
         difference_large = round(np.trapz(data['Diff Large'], x=mdates.date2num(data['ds'])), 2)
@@ -319,21 +411,6 @@ class ModelIndicators:
         
         plt.close(fig)
         return image
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def ManyPlots(self, SinceDate, RealPrice, FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time ):
         
