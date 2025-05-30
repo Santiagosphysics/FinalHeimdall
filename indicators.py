@@ -33,11 +33,16 @@ class ModelIndicators:
         fourth_data = get_data_crypto().download_data_volume(start_time=fourth_time, end_time=start_time, crypto=crypto, time=time)
         fifth_data  = get_data_crypto().download_data_volume(start_time= fifth_time, end_time=start_time, crypto=crypto, time=time)
 
-        df1, first_pred = XGBoost().XGBoost_final(data=first_data, time=time, crypto=crypto)
-        df2, second_pred= XGBoost().XGBoost_final(data=second_data, time=time, crypto=crypto)
-        df3, third_pred = XGBoost().XGBoost_final(data=third_data, time=time, crypto=crypto)
-        df4, fourth_pred =XGBoost().XGBoost_final(data=fourth_data, time=time, crypto=crypto)
-        df5, fifth_pred = XGBoost().XGBoost_final(data=fifth_data, time=time, crypto=crypto)
+        metric_1, first_pred = XGBoost().XGBoostMetrcis(data=first_data, time=time, crypto=crypto)
+        metric_2, second_pred= XGBoost().XGBoostMetrcis(data=second_data, time=time, crypto=crypto)
+        metric_3, third_pred = XGBoost().XGBoostMetrcis(data=third_data, time=time, crypto=crypto)
+        metric_4, fourth_pred =XGBoost().XGBoostMetrcis(data=fourth_data, time=time, crypto=crypto)
+        metric_5, fifth_pred = XGBoost().XGBoostMetrcis(data=fifth_data, time=time, crypto=crypto)
+
+
+        metrics = pd.concat([metric_1, metric_2, metric_3, metric_4, metric_5])
+        metrics['Training Days'] = [f'Train {FirstTime} days', f'Train {SecondTime} days', f'Train {ThirdTime} days',f'Train {FourthTime} days', f'Train {FifthTime} days']
+
 
         print(len(first_pred), len(second_pred), len(third_pred), len(fourth_pred), len(fifth_pred))
 
@@ -61,7 +66,7 @@ class ModelIndicators:
 
         data = data.dropna().reset_index(drop=True)
 
-        return data
+        return metrics, data
 
     def development_model(self, end_time, days_fine_pred, days_pred, crypto, time):
 
@@ -258,11 +263,20 @@ class ModelIndicators:
         real_data = get_data_crypto().download_data(start_time=end_time, end_time= future_time, crypto=crypto, time=time)
         real_data = real_data.rename(columns={'close_time':'ds','close':'Real Price'})
 
-        df1, first_pred =  XGBoost().XGBoost_final(data=first_data, time=time, crypto=crypto)
-        df2, second_pred= XGBoost().XGBoost_final(data=second_data, time=time, crypto=crypto)
-        df3, third_pred = XGBoost().XGBoost_final(data=third_data, time=time, crypto=crypto)
-        df4, fourth_pred =XGBoost().XGBoost_final(data=fourth_data, time=time, crypto=crypto)
-        df5, fifth_pred = XGBoost().XGBoost_final(data=fifth_data, time=time, crypto=crypto)
+        # df1, first_pred = XGBoost().XGBoost_final(data=first_data, time=time, crypto=crypto)
+        # df2, second_pred= XGBoost().XGBoost_final(data=second_data, time=time, crypto=crypto)
+        # df3, third_pred = XGBoost().XGBoost_final(data=third_data, time=time, crypto=crypto)
+        # df4, fourth_pred =XGBoost().XGBoost_final(data=fourth_data, time=time, crypto=crypto)
+        # df5, fifth_pred = XGBoost().XGBoost_final(data=fifth_data, time=time, crypto=crypto)
+
+        metric_1, first_pred = XGBoost().XGBoostMetrcis(data=first_data, time=time, crypto=crypto)
+        metric_2, second_pred= XGBoost().XGBoostMetrcis(data=second_data, time=time, crypto=crypto)
+        metric_3, third_pred = XGBoost().XGBoostMetrcis(data=third_data, time=time, crypto=crypto)
+        metric_4, fourth_pred =XGBoost().XGBoostMetrcis(data=fourth_data, time=time, crypto=crypto)
+        metric_5, fifth_pred = XGBoost().XGBoostMetrcis(data=fifth_data, time=time, crypto=crypto)
+
+        metrics = pd.concat([metric_1, metric_2, metric_3, metric_4, metric_5])
+        metrics['Training Days'] = [f'Train {FirstTime} days', f'Train {SecondTime} days', f'Train {ThirdTime} days',f'Train {FourthTime} days', f'Train {FifthTime} days']
 
         first_pred  = first_pred.rename( columns={'Pred Price' :f'Train {FirstTime} days'})
         second_pred = second_pred.rename(columns= {'Pred Price':f'Train {SecondTime} days'})
@@ -284,7 +298,7 @@ class ModelIndicators:
 
         data = data.dropna().reset_index(drop=True)
 
-        return data
+        return metrics, data
     
 
 # *****************************************************************************************************************************************************

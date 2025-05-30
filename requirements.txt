@@ -7,3 +7,4 @@ prophet
 cryptography
 python-dotenv
 xgboost
+ployly
