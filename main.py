@@ -1,14 +1,18 @@
-from utils import meassures
-
-time_in= '03:03:59.999'
-time_out = '05:00:59.999'
-
-end_time = '2025-02-21 09:01:59.999'
-
-day = 'second'
+from indicators import ModelIndicators
+ 
+end_time = '2025-02-12 00:00:00'
+ 
 crypto='ETHUSDT'
+time='min'
 
-data = meassures().ImportData(data_path='./data.csv')
-test = meassures().testing(test=data, time_in=time_in, time_out=time_out, end_time=end_time, day=day, crypto=crypto)
+FirstTime= 5
+SecondTime=10
+ThirdTime= 15
+FourthTime=20
+FifthTime= 25
 
-print(test)
+RealPrice = 'off'
+ShowImage = 'on'
+
+data = ModelIndicators().XGBoostTimeReduce(end_time, FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time)
+plot_1 = ModelIndicators().CreateImagesFivePreds(data=data, RealPrice=RealPrice, ShowImage=ShowImage, crypto=crypto)

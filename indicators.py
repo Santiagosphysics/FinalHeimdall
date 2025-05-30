@@ -244,18 +244,18 @@ class ModelIndicators:
         third_time = end_time - pd.Timedelta(minutes  = ThirdTime*24*60 )
         fourth_time = end_time - pd.Timedelta(minutes = FourthTime*24*60)
         fifth_time = end_time - pd.Timedelta(minutes   = FifthTime*24*60)
+    
 
         future_time = end_time + pd.Timedelta(minutes = 24*60)
 
         fifth_data  = get_data_crypto().download_data_volume(start_time= fifth_time, end_time=end_time, crypto=crypto, time=time)
-          
-        fourth_data = fifth_data[fifth_data['ds'] >= fourth_time].copy()
-        third_data = fifth_data[fifth_data['ds'] >= third_time].copy()
-        second_data = fifth_data[fifth_data['ds'] >= second_time].copy()
-        first_data = fifth_data[fifth_data['ds'] >= first_time].copy()
+
+        fourth_data = fifth_data[fifth_data['close_time'] >= fourth_time].copy()
+        third_data = fifth_data[fifth_data['close_time'] >= third_time].copy()
+        second_data = fifth_data[fifth_data['close_time'] >= second_time].copy()
+        first_data = fifth_data[fifth_data['close_time'] >= first_time].copy()
 
         real_data = get_data_crypto().download_data(start_time=end_time, end_time= future_time, crypto=crypto, time=time)
-
         real_data = real_data.rename(columns={'close_time':'ds','close':'Real Price'})
 
         df1, first_pred =  XGBoost().XGBoost_final(data=first_data, time=time, crypto=crypto)
@@ -281,10 +281,6 @@ class ModelIndicators:
         data = pd.merge(left=data, right=third_pred, on='ds', how='left')
         data = pd.merge(left=data, right=fourth_pred, on='ds', how='left')
         data = pd.merge(left=data, right=fifth_pred, on='ds', how='left')
-
-
-        data['Diff Fine'] = np.absolute(data['Real Price'] - data[f'Train {SecondTime} days'])
-        data['Diff Large'] = np.absolute(data['Real Price'] - data[f'Train {FourthTime} days'])
 
         data = data.dropna().reset_index(drop=True)
 
