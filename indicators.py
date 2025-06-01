@@ -433,7 +433,7 @@ class ModelIndicators:
 
         for i in range(diff_days):
             date = date + pd.Timedelta(days=1)
-            test_days[f'day_{i+1}'] = ModelIndicators().XGBoostFinalFivePreds(end_time=date, FirstTime=FirstTime, SecondTime=SecondTime, ThirdTime=ThirdTime, FourthTime=FourthTime, FifthTime=FifthTime, crypto=crypto, time=time)
+            metrics, test_days[f'day_{i+1}'] = ModelIndicators().XGBoostTimeReduce(end_time=date, FirstTime=FirstTime, SecondTime=SecondTime, ThirdTime=ThirdTime, FourthTime=FourthTime, FifthTime=FifthTime, crypto=crypto, time=time)
             test_days[f'image_{i+1}'] = ModelIndicators().CreateImagesFivePreds(test_days[f'day_{i+1}'], ShowImage='off', RealPrice=RealPrice, crypto=crypto)
             img = Image.fromarray(test_days[f'image_{i+1}'])
             img.save(f'./plots/image_{i+1}.png')

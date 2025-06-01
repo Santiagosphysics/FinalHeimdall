@@ -92,16 +92,19 @@ class XGBoost:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, train_size= 0.8, random_state=42 )
 
         model = xgb.XGBRegressor(objective='reg:squarederror', 
-                                 n_estimators=2000, # Best development with 500 trees
-                                 learning_rate=0.15,
-                                 alpha=1, # Best development with 1,
-                                 max_depth = 7,
-                                 reg_lambda = 1,
-                                 random_state = 42
+                                 n_estimators=500, # Best development with 500 trees
+                                 learning_rate=0.05,
+                                 alpha=10, # Best development with 1,
+                                 reg_lambda = 10,                                 
+                                 max_depth = 4,
+                                 random_state = 42,
+                                 early_stopping_rounds=40,
+                                 subsample=0.8,
+                                 colsample_bytree=0.8
                                  )
         
-        model.fit(X_train, y_train, eval_set=[(X_test, y_test)], early_stopping_rounds=20, verbose=False)
-        # model.fit(X_train, y_train)
+        model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
+
 
         if time == 'min':
             df_pred = pd.date_range(start=df['ds'].max() + pd.Timedelta(minutes=1), periods=24*60, freq='min')
