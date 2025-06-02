@@ -6,6 +6,8 @@ from volume import VolumeXGBoost
 from sklearn.metrics  import mean_absolute_error, mean_squared_error, r2_score, root_mean_squared_log_error
 from sklearn.model_selection import train_test_split
 
+import matplotlib.pyplot as plt
+
 
 class XGBoost:    
 
@@ -92,18 +94,35 @@ class XGBoost:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, train_size= 0.8, random_state=42 )
 
         model = xgb.XGBRegressor(objective='reg:squarederror', 
-                                 n_estimators=500, # Best development with 500 trees
-                                 learning_rate=0.05,
-                                 alpha=10, # Best development with 1,
-                                 reg_lambda = 10,                                 
-                                 max_depth = 4,
+                                 n_estimators=2000,
+                                 learning_rate=0.02,
+                                 alpha=50, 
+                                 reg_lambda = 50,                                 
+                                 max_depth = 3,
                                  random_state = 42,
-                                 early_stopping_rounds=40,
-                                 subsample=0.8,
-                                 colsample_bytree=0.8
+                                 early_stopping_rounds=15,
+                                 subsample=0.6,
+                                 colsample_bytree=0.6,
+                                 
                                  )
+
         
-        model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
+        model.fit(X_train, y_train, eval_set=[(X_train, y_train),(X_test, y_test)], verbose=False )
+
+        evals_result = model.evals_result()
+
+
+        train_error = evals_result['validation_0']['rmse']
+        valid_error = evals_result['validation_1']['rmse']
+
+        plt.figure(figsize=(10,6))
+        plt.plot(train_error, label='Train')
+        plt.plot(valid_error, label ='Validation')
+        plt.xlabel('Iteración')
+        plt.ylabel('RMSE')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
 
         if time == 'min':
