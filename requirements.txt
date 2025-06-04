@@ -3,8 +3,8 @@ numpy
 matplotlib
 scikit-learn
 python-binance
-prophet
 cryptography
 python-dotenv
 xgboost
 ployly
+openpyxl

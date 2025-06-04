@@ -1,7 +1,4 @@
-
-import matplotlib
-
-from utils import models, get_data_crypto, meassures
+from utils import models, get_data_crypto
 from XGBoost_model import XGBoost
 
 import pandas as pd 
@@ -14,8 +11,7 @@ import matplotlib.dates as mdates
 from matplotlib.backends.backend_agg import FigureCanvas
 
 from PIL import Image
-from IPython.display import display
-from PIL import Image as PILImage
+
 
 class ModelIndicators:
     def predictions(self, FirstTime, SecondTime, ThirdTime, FourthTime, FifthTime, crypto, time):
@@ -262,12 +258,6 @@ class ModelIndicators:
 
         real_data = get_data_crypto().download_data(start_time=end_time, end_time= future_time, crypto=crypto, time=time)
         real_data = real_data.rename(columns={'close_time':'ds','close':'Real Price'})
-
-        # df1, first_pred = XGBoost().XGBoost_final(data=first_data, time=time, crypto=crypto)
-        # df2, second_pred= XGBoost().XGBoost_final(data=second_data, time=time, crypto=crypto)
-        # df3, third_pred = XGBoost().XGBoost_final(data=third_data, time=time, crypto=crypto)
-        # df4, fourth_pred =XGBoost().XGBoost_final(data=fourth_data, time=time, crypto=crypto)
-        # df5, fifth_pred = XGBoost().XGBoost_final(data=fifth_data, time=time, crypto=crypto)
 
         metric_1, first_pred = XGBoost().XGBoostMetrcis(data=first_data, time=time, crypto=crypto)
         metric_2, second_pred= XGBoost().XGBoostMetrcis(data=second_data, time=time, crypto=crypto)

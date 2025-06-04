@@ -9,7 +9,7 @@ class VolumeXGBoost:
         data = data[[ 'close_time', 'close', 'volume', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume','taker_buy_quote_asset_volume']]
         return data
     
-    #Changed since commit 1.2.6, the last one working
+    # Changed since commit 1.2.6, the last one working
     def model_volume(self, end_time, days_fine_pred, crypto, time):
         end_time = pd.to_datetime(end_time)
 
@@ -38,9 +38,19 @@ class VolumeXGBoost:
 
         data = data.dropna(subset=['Fine Vol'], ignore_index=True)
 
-
         return data
+    
 
+
+    # Changed since commit 1.2.6, the last one working
+    def VolumeModel(self, data, time):
+        first_pred, metrics = models().XGBoost_model(data=data, time=time)
+        first_pred = first_pred.rename(columns={'y':'volume'})
+        print(metrics)
+
+        return first_pred
+
+    
 
     
 
