@@ -241,22 +241,8 @@ class XGBoost:
         df_final['dayofweek'] = df_final['ds'].dt.dayofweek
         df_final['day'] =       df_final['ds'].dt.day
 
-
-
-
-
-        volume_pred = VolumeXGBoost().VolumeModel(data= df[['ds', 'volume']] , time=time) #-------------------------------------------
+        volume_pred, vol_metrics = VolumeXGBoost().VolumeModel(data= df[['ds', 'volume']] , time=time) #-------------------------------------------
         df_final['volume'] = volume_pred['volume']
-
-
-
-
-
-
-
-
-
-
 
         if time == 'S' or time == 's':
             df_final['second'] = df_final['ds'].dt.second
@@ -277,5 +263,5 @@ class XGBoost:
 
         metrics = pd.DataFrame(metrics)
 
-        return metrics, df_final
+        return metrics, vol_metrics, df_final
 

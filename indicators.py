@@ -259,11 +259,14 @@ class ModelIndicators:
         real_data = get_data_crypto().download_data(start_time=end_time, end_time= future_time, crypto=crypto, time=time)
         real_data = real_data.rename(columns={'close_time':'ds','close':'Real Price'})
 
-        metric_1, first_pred = XGBoost().XGBoostMetrcis(data=first_data, time=time, crypto=crypto)
-        metric_2, second_pred= XGBoost().XGBoostMetrcis(data=second_data, time=time, crypto=crypto)
-        metric_3, third_pred = XGBoost().XGBoostMetrcis(data=third_data, time=time, crypto=crypto)
-        metric_4, fourth_pred =XGBoost().XGBoostMetrcis(data=fourth_data, time=time, crypto=crypto)
-        metric_5, fifth_pred = XGBoost().XGBoostMetrcis(data=fifth_data, time=time, crypto=crypto)
+        metric_1, metric_vol_1, first_pred = XGBoost().XGBoostMetrcis(data=first_data, time=time, crypto=crypto)
+        metric_2, metric_vol_2, second_pred= XGBoost().XGBoostMetrcis(data=second_data, time=time, crypto=crypto)
+        metric_3, metric_vol_3, third_pred = XGBoost().XGBoostMetrcis(data=third_data, time=time, crypto=crypto)
+        metric_4, metric_vol_4, fourth_pred =XGBoost().XGBoostMetrcis(data=fourth_data, time=time, crypto=crypto)
+        metric_5, metric_vol_5, fifth_pred = XGBoost().XGBoostMetrcis(data=fifth_data, time=time, crypto=crypto)
+        
+        metrics_vol = pd.concat([metric_vol_1, metric_vol_2, metric_vol_3, metric_vol_4, metric_vol_5])
+        metrics_vol['Training Days'] = [f'Train {FirstTime} days', f'Train {SecondTime} days', f'Train {ThirdTime} days',f'Train {FourthTime} days', f'Train {FifthTime} days']
 
         metrics = pd.concat([metric_1, metric_2, metric_3, metric_4, metric_5])
         metrics['Training Days'] = [f'Train {FirstTime} days', f'Train {SecondTime} days', f'Train {ThirdTime} days',f'Train {FourthTime} days', f'Train {FifthTime} days']
@@ -288,7 +291,7 @@ class ModelIndicators:
 
         data = data.dropna().reset_index(drop=True)
 
-        return metrics, data
+        return metrics,metrics_vol, data
     
 
 # *****************************************************************************************************************************************************

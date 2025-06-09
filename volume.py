@@ -41,14 +41,11 @@ class VolumeXGBoost:
         return data
     
 
-
-    # Changed since commit 1.2.6, the last one working
     def VolumeModel(self, data, time):
         first_pred, metrics = models().XGBoost_model(data=data, time=time)
         first_pred = first_pred.rename(columns={'y':'volume'})
-        print(metrics)
 
-        return first_pred
+        return first_pred, metrics
 
     
 

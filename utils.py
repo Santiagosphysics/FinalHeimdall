@@ -190,73 +190,6 @@ class models:
         return df, df_final
     
 
-    # def XGBoost_model(self, data, time ):
-    #     data.columns = ['ds', 'y']
-    #     df = pd.DataFrame()
-
-    #     if time == 'S':
-    #         df['second']= data['ds'].dt.second
-        
-    #     df['minute'] = data['ds'].dt.minute
-    #     df['hour'] = data['ds'].dt.hour
-    #     df['dayofweek'] = data['ds'].dt.dayofweek
-    #     df['day'] = data['ds'].dt.day
-
-    #     df['y'] = round(data['y'], 3)
-    #     df['ds'] = data['ds']
-
-    #     X = df[['minute', 'hour', 'day', 'dayofweek']]
-    #     y = df['y']
-
-    #     # model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
-
-    #     model = xgb.XGBRegressor(objective='reg:squarederror', 
-    #                              n_estimators=2000,
-    #                              learning_rate=0.02,
-    #                              alpha=50, 
-    #                              reg_lambda = 50,                                 
-    #                              max_depth = 3,
-    #                              random_state = 42,
-    #                              early_stopping_rounds=15,
-    #                              subsample=0.6,
-    #                              colsample_bytree=0.6,
-    #                              )
-        
-    #     model.fit(X, y)
-
-    #     if time == 'min':
-    #         df_pred = pd.date_range(start=df['ds'].max() + pd.Timedelta(minutes=1), periods=24*60, freq='min')
-    #     elif time == 'S':
-    #         df_pred = pd.date_range(start=df['ds'].max() + pd.Timedelta(seconds=1), periods=24*60*60, freq='S')
-    #     else:
-    #         raise ValueError('Please write a correct option (min, S) ')
-        
-
-    #     df_final = pd.DataFrame({'ds':df_pred})
-
-    #     df_final['minute'] =    df_final['ds'].dt.minute
-    #     df_final['hour'] =      df_final['ds'].dt.hour
-    #     df_final['dayofweek'] = df_final['ds'].dt.dayofweek
-    #     df_final['day'] =       df_final['ds'].dt.day
-
-
-
-    #     if time == 's':
-    #         df_final['second'] = df_final['ds'].dt.second
-    #         X_final = df_final[['second', 'minute', 'hour', 'dayofweek', 'day']]
-    #     else:
-    #         X_final = df_final[['minute', 'hour', 'day', 'dayofweek']]
-    #     response = model.predict(X_final)
-
-    #     df_final['y'] = response
-
-    #     df_real = pd.DataFrame({'ds':df['ds'],'y':df['y']})
-    #     df_result = pd.concat([df_real, df_final], ignore_index=True)
-    #     df_result = df_result[['ds', 'y']]
-
-    #     return df, df_final
-
-
 
     def XGBoost_model(self, data, time ):
         data.columns = ['ds', 'y']
@@ -278,14 +211,6 @@ class models:
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, train_size= 0.8, random_state=42 )
 
-        param_grid = {
-            'n_estimators':[500, 1000, 2000],
-            'learning_rate':[0.01, 0.05, 0.1],
-            'max_depth':[3,4,5],
-            'subsample':[0.6, 0.8, 1.0],
-            'reg_alpha':[0, 10, 25, 50],
-            'reg_lambda':[0, 10, 50]
-        }
 
         model = xgb.XGBRegressor(objective='reg:squarederror', 
                                  n_estimators=2000,
@@ -298,23 +223,6 @@ class models:
                                  subsample=0.6,
                                 #  colsample_bytree=0.6,
                                  )
-        
-        # model = xgb.XGBRegressor(objective='reg:squarederror', random_state=42)
-        # grid_search = GridSearchCV(estimator=model, 
-        #                            param_grid=param_grid,
-        #                            scoring='r2',
-        #                            cv=3,
-        #                            n_jobs=-1,
-        #                            verbose=1)
-        
-        # grid_search.fit(X_train, y_train)
-
-        # print('Best parameters founds; ', grid_search.best_params_)
-        # print('Best r2 score: ', grid_search.best_score_)
-
-        # best_model = grid_search.best_estimator_
-
-
 
         model.fit(X_train, y_train, eval_set=[(X_train, y_train),(X_test, y_test)], verbose=False )
 
@@ -323,17 +231,7 @@ class models:
 
         train_error = evals_result['validation_0']['rmse']
         valid_error = evals_result['validation_1']['rmse']
-
-        plt.figure(figsize=(10,6))
-        plt.plot(train_error, label='Train')
-        plt.plot(valid_error, label ='Validation')
-        plt.xlabel('Iteración')
-        plt.ylabel('RMSE')
-        plt.legend()
-        plt.grid(True)
-        plt.show()
-
-        
+    
 
         if time == 'min':
             df_pred = pd.date_range(start=df['ds'].max() + pd.Timedelta(minutes=1), periods=24*60, freq='min')
@@ -349,7 +247,6 @@ class models:
         df_final['hour'] =      df_final['ds'].dt.hour
         df_final['dayofweek'] = df_final['ds'].dt.dayofweek
         df_final['day'] =       df_final['ds'].dt.day
-
 
 
         if time == 's':

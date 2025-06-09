@@ -41,3 +41,21 @@ New task:
     . RMSE, R2 and anothers stadistics for validation
     . Create a plan for investing
     . Create manual validation for each pred, it means you can choice the day (right now you can select the hour)
+
+June 04
+All task have made.
+
+New Task:
+    . Include in the features the next stadistics:
+        . SMA (Simple moving average)
+        . EMA (Exponential moving average)
+        . RSI (Relative strenght index)
+        . ROC (Rate of change)
+        . MACD (Moving average convergence divergence)
+        . Stochastic Oscillator
+        . ATR (Average true range)
+        . Bollinger Bands
+        . Mean Volume 
+
+June 09
+I have not made any task 
