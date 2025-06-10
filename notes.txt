@@ -57,5 +57,6 @@ New Task:
         . Bollinger Bands
         . Mean Volume 
 
-June 09
-I have not made any task 
+June 10
+I have been made:
+    . RSI

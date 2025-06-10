@@ -214,8 +214,8 @@ class XGBoost:
         evals_result = model.evals_result()
 
 
-        # train_error = evals_result['validation_0']['rmse']
-        # valid_error = evals_result['validation_1']['rmse']
+        train_error = evals_result['validation_0']['rmse']
+        valid_error = evals_result['validation_1']['rmse']
 
         # plt.figure(figsize=(10,6))
         # plt.plot(train_error, label='Train')

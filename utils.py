@@ -267,7 +267,7 @@ class models:
         mse = mean_squared_error(y_test, y_pred)
         rmse = root_mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
-        metrics = {'MeanAbsoluteError':[mae], 'RootMeanSquaredError':[rmse], 'MeanSquaredError':[mse], 'r2':[r2]}
+        metrics = {'Vol MeanAbsoluteError':[mae], 'Vol RootMeanSquaredError':[rmse], 'Vol MeanSquaredError':[mse], 'Vol r2':[r2]}
         metrics = pd.DataFrame(metrics)
 
         return df_final, metrics
@@ -485,5 +485,24 @@ class meassures():
         data = pd.read_csv(data_path)
         data['ds'] = pd.to_datetime(data['ds'])
         return data
+
+
+    def RSI(self, data, window=60):
+        data = data.tail(window).copy()
+        data['close'] = data['close'].astype(float)
+        
+        data['delta'] = data['close'].diff()
+
+        avg_profit = np.mean(list(filter(lambda x: x >= 0, data['delta'])))
+        avg_loss = abs(np.mean(data['delta'][data['delta'] < 0 ]))
+        
+        rs = avg_profit/avg_loss
+
+        rsi = round(float(100-(100/(1+rs))),2)
+
+        if rsi < 30:
+            print(f' \033[92mBuy {'*'*50} RSI: {rsi}  {'*'*50} \033[0m') 
+        else:
+            print(f'\033[91m {'*'*50}  RSI: {rsi}  {'*'*50} \033[0m') 
 
             

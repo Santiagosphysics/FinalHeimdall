@@ -271,6 +271,8 @@ class ModelIndicators:
         metrics = pd.concat([metric_1, metric_2, metric_3, metric_4, metric_5])
         metrics['Training Days'] = [f'Train {FirstTime} days', f'Train {SecondTime} days', f'Train {ThirdTime} days',f'Train {FourthTime} days', f'Train {FifthTime} days']
 
+
+
         first_pred  = first_pred.rename( columns={'Pred Price' :f'Train {FirstTime} days'})
         second_pred = second_pred.rename(columns= {'Pred Price':f'Train {SecondTime} days'})
         third_pred  = third_pred.rename(columns= {'Pred Price' :f'Train {ThirdTime} days'})
@@ -289,9 +291,14 @@ class ModelIndicators:
         data = pd.merge(left=data, right=fourth_pred, on='ds', how='left')
         data = pd.merge(left=data, right=fifth_pred, on='ds', how='left')
 
+
+
+        metrics = pd.merge(left=metrics, right=metrics_vol, on=f'Training Days', how='left')
+
+
         data = data.dropna().reset_index(drop=True)
 
-        return metrics,metrics_vol, data
+        return metrics, data, fifth_data
     
 
 # *****************************************************************************************************************************************************
